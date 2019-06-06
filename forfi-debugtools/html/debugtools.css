@@ -1,0 +1,20 @@
+.debugtools {
+  font-family: "Verdana";
+  display: none;
+}
+
+.debugtools {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.debugtools .textbox textarea {
+  min-width: 200px;
+  min-height: 100px;
+}
+
+.debugtools .close {
+  padding: 4px;
+  font-size: 16px;
+}
