@@ -1,5 +1,5 @@
 # fivem-debugtools
-Simple debug tools for FiveM servers.
+Simple debug tools for FiveM servers made with JavaScript!
 
 ## Commands list
 
