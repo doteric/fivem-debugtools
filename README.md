@@ -3,7 +3,9 @@ Simple debug tools for FiveM servers made with JavaScript!
 
 ## Commands list
 
-🚫 - Restricted by default unless you have the needed permission.
+🚫 - Restricted by default unless you have the needed permission.  
+
+Commands:
 
 🚫 **/tppos [x] [y] [z]**  
 Teleport to xyz corrds.  
