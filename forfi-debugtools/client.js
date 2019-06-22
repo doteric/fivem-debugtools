@@ -3,24 +3,34 @@ let debugInfoEnabled = false;
 RegisterNetEvent("forfi-debugtools:tppos");
 onNet("forfi-debugtools:tppos", (pos) => {
   if (pos[0] && pos[1] && pos[2]) {
-    SetPedCoordsKeepVehicle(GetPlayerPed(-1), parseInt(pos[0]), parseInt(pos[1]), parseInt(pos[2]));
+    tpToCoords(parseInt(pos[0]), parseInt(pos[1]), parseInt(pos[2]));
   }
 });
 
 RegisterNetEvent("forfi-debugtools:tpto");
 onNet("forfi-debugtools:tpto", (pid) => {
   if (pid) {
-    let myVehicle = GetVehiclePedIsIn(GetPlayerPed(-1), false);
-    let targetPed = GetPlayerPed(GetPlayerFromServerId(parseInt(pid)));
-    let targetVehicle = GetVehiclePedIsIn(targetPed, false);
-    SetEntityNoCollisionEntity(myVehicle, targetVehicle, false);
-    setTimeout(() => {
-      SetEntityNoCollisionEntity(myVehicle, targetVehicle, true);
-    }, 5000);
-    let targetCoords = GetEntityCoords(targetPed);
-    SetPedCoordsKeepVehicle(GetPlayerPed(-1), targetCoords[0], targetCoords[1], targetCoords[2]+0.5);
+    const targetPed = GetPlayerPed(GetPlayerFromServerId(parseInt(pid)));
+    const targetCoords = GetEntityCoords(targetPed);
+    tpToCoords(targetCoords[0], targetCoords[1], targetCoords[2]+0.5);
   }
 });
+
+async function tpToCoords(x, y, z) {
+  const playerPed = GetPlayerPed(-1);
+  const myVehicle = GetVehiclePedIsIn(playerPed, false);
+  let entityToFreeze = playerPed;
+  if (DoesEntityExist(myVehicle) && IsEntityAVehicle(myVehicle)) {
+    SetNetworkVehicleRespotTimer(VehToNet(myVehicle), 5000);
+    entityToFreeze = myVehicle;
+  }
+  SetPedCoordsKeepVehicle(playerPed, x, y, z);
+  FreezeEntityPosition(entityToFreeze, true);
+  while (!HasCollisionLoadedAroundEntity(entityToFreeze)) {
+    await Wait(100);
+  }
+  FreezeEntityPosition(entityToFreeze, false);
+}
 
 RegisterNetEvent("forfi-debugtools:tpwaypoint");
 onNet("forfi-debugtools:tpwaypoint", async () => {
@@ -251,7 +261,7 @@ setImmediate(() => {
   ]);
 });
 
-/*setTick(() => {
+setTick(() => {
   if (IsControlJustReleased(1, 56)) {
     debugInfoEnabled = !debugInfoEnabled;
   }
@@ -259,9 +269,9 @@ setImmediate(() => {
     const pos = GetEntityCoords(GetPlayerPed(-1));
     const heading = GetEntityHeading(GetPlayerPed(-1));
     const text = "X: "+pos[0].toFixed(2)+", Y: "+pos[1].toFixed(2)+", Z: "+pos[2].toFixed(2)+", H: "+heading.toFixed(2);
-    exports["forfi-core"].showText(0.75, 0.005, 0.3, text, 170, 170, 170, 255);
+    emit("showText", 0.75, 0.005, 0.3, text, 170, 170, 170, 255);
   }
-});*/
+});
 
 async function spawnVehicle(modelHash, data, markAsNotNeeded = true) {
   RequestModel(modelHash);
